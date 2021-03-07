@@ -5,6 +5,9 @@ import { createUploadLink } from 'apollo-upload-client';
 import withApollo from 'next-with-apollo';
 import { endpoint, prodEndpoint } from '../config';
 
+// This is instead of the apollo-boost package.
+// This is needed b/c apollo-boost does not handle image uploads.
+
 function createClient({ headers, initialState }) {
   return new ApolloClient({
     link: ApolloLink.from([
