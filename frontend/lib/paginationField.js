@@ -23,7 +23,7 @@ export default function paginationField() {
       }
       if (items.length) {
         // if there are items, return them from cache and no need to go to network
-        console.log(`There are ${items.length} items in the Apollo cache`);
+        // console.log(`There are ${items.length} items in the Apollo cache`);
         return items;
       }
       return false; // fallback to network
