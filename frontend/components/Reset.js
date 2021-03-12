@@ -1,57 +1,53 @@
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/client';
-import Router from 'next/router';
 import Form from './styles/Form';
 import useForm from '../lib/useForm';
-import { CURRENT_USER_QUERY } from './User';
 import DisplayError from './ErrorMessage';
 
-const SIGNIN_MUTATION = gql`
-  mutation SIGNIN_MUTATION($email: String!, $password: String!) {
-    authenticateUserWithPassword(email: $email, password: $password) {
-      ... on UserAuthenticationWithPasswordSuccess {
-        item {
-          id
-          email
-          name
-        }
-      }
-      ... on UserAuthenticationWithPasswordFailure {
-        code
-        message
-      }
+const RESET_MUTATION = gql`
+  mutation RESET_MUTATION(
+    $email: String!
+    $token: String!
+    $password: String!
+  ) {
+    redeemUserPasswordResetToken(
+      email: $email
+      token: $token
+      password: $password
+    ) {
+      code
+      message
     }
   }
 `;
 
-export default function SignIn() {
+export default function Reset({ token }) {
   const { inputs, handleChange, resetForm } = useForm({
     email: '',
     password: '',
+    token,
   });
-  const [signin, { data, loading }] = useMutation(SIGNIN_MUTATION, {
+  const [reset, { data, loading, error }] = useMutation(RESET_MUTATION, {
     variables: inputs,
-    // refetch the currently logged in user
-    refetchQueries: [{ query: CURRENT_USER_QUERY }],
   });
   async function handleSubmit(e) {
     e.preventDefault();
     // Send the email and password to graphQL API
-    await signin().catch(console.error);
+    await reset().catch(console.error);
     resetForm();
-    Router.push({ pathname: `/products` });
   }
-  const error =
-    data?.authenticateUserWithPassword.__typename ===
-    'UserAuthenticationWithPasswordFailure'
-      ? data?.authenticateUserWithPassword
-      : undefined;
-
+  const successfulError = data?.redeemUserPasswordResetToken?.code
+    ? data?.redeemUserPasswordResetToken
+    : undefined;
+  console.log(error);
   return (
     <Form method="POST" onSubmit={handleSubmit}>
-      <h2>Sign In</h2>
-      <DisplayError error={error} />
+      <h2>Reset your password</h2>
+      <DisplayError error={error || successfulError} />
       <fieldset disabled={loading} aria-busy={loading}>
+        {data?.redeemUserPasswordResetToken === null && (
+          <p>Success! You can now log in.</p>
+        )}
         <label htmlFor="email">
           Email
           <input
@@ -76,7 +72,7 @@ export default function SignIn() {
             onChange={handleChange}
           />
         </label>
-        <button type="submit">Sign In</button>
+        <button type="submit">Request Reset</button>
       </fieldset>
     </Form>
   );
