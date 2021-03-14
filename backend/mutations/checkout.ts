@@ -5,8 +5,8 @@ import stripeConfig from '../lib/stripe';
 
 const graphql = String.raw;
 
-interface Arguments{
-  token:string
+interface Arguments {
+  token: string
 }
 
 export default async function checkout(
