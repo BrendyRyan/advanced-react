@@ -57,7 +57,6 @@ function CheckoutForm() {
     // 1. stop form from submitting and turn the loader on
     e.preventDefault();
     setLoading(true);
-    console.log('We gotta do some work');
     // 2. Start the page transition
     nProgress.start();
     // 3. Create the payment method via stripe -> token comes back here if successful
